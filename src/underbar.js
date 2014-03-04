@@ -163,10 +163,10 @@ var _ = { };
     var initialValue = accumulator === undefined ? collection[0] : accumulator;
     var previousValue = initialValue;
     
-    for (var index = 0; index < collection.length; index++) {
-      result = iterator(previousValue, collection[index]);
+    _.each(collection, function(value) {
+      result = iterator(previousValue, value);
       previousValue = result;
-    }
+    });
     
     return result;
   };
