@@ -369,10 +369,8 @@ var _ = { };
         }
       }
       
-
-        collection[lowestIndex] = collection[leftIndex];
-        collection[leftIndex] = lowestElement;
-      
+      collection[lowestIndex] = collection[leftIndex];
+      collection[leftIndex] = lowestElement;
     }
     
   	return collection;
@@ -384,6 +382,24 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var result = [];
+    
+    var longestArgumentLength = 0;
+    for (var i = 0; i < arguments.length; i++) {
+      if (arguments[i].length > longestArgumentLength) longestArgumentLength = arguments[i].length;
+    }
+    
+    for (var i = 0; i < longestArgumentLength; i++) {
+      result.push([]);
+    }
+
+    for (var i = 0; i < arguments.length; i++) {
+      for (var j = 0; j < longestArgumentLength; j++) {
+        result[j].push(arguments[i][j]);
+      }
+    }
+    
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
