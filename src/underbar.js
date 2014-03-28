@@ -407,6 +407,15 @@ var _ = { };
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    // base case: array is empty.
+    if (nestedArray === undefined || nestedArray.length === 0) return;
+    // base case: nestedArray is size 1 and the element is not an array, return that element.
+    if (nestedArray.length === 1 && !(nestedArray[0] instanceof Array)) return nestedArray;
+    
+    // recursive case: nested array is size 1 and the element is an array, recurse over nested array.
+    if (nestedArray.length === 1 && nestedArray[0] instanceof Array) return _.flatten(nestedArray[0]);
+    // recursive case: recurse over first elemented and the rest of the collection.    
+    return _.flatten(nestedArray.slice(0, 1)).concat(_.flatten(nestedArray.slice(1)));
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
