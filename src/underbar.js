@@ -441,6 +441,25 @@ var _ = { };
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var elements = {};
+    for (var i = 0; i < array.length; i++) {
+      elements[array[i]] = true;
+    }
+    // this intersection code is repeated from _.intersection. It should probably be refactored
+    var intersection = {};
+    for (var i = 0; i < arguments.length; i++) {
+      for (var j = 0; j < arguments[i].length; j++) {
+        intersection[arguments[i][j]] = intersection[arguments[i][j]] === undefined ?
+          false : true;
+      }
+    }
+
+    var difference = [];
+    for (var i = 0; i < array.length; i++) {
+      if (!(elements[array[i]] && intersection[array[i]])) difference.push(array[i]);
+    }
+
+    return difference;
   };
 
 
