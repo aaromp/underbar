@@ -91,17 +91,13 @@ var _ = { };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
-    var result = array;
+    var duplicateFreeSet = {};
 
-    for (var index = 0; index < result.length; index++) {
-      var duplicateFreeFront = result.slice(0, index + 1);
-      var filteredBack = _.reject(result.slice(index + 1), function(element) {
-                           return element === result[index];
-                         });
-      result = duplicateFreeFront.concat(filteredBack);
+    for (var index = 0; index < array.length; index++) {
+      duplicateFreeSet[array[index]] = true;
     }
-    
-    return result;
+
+    return Object.keys(duplicateFreeSet);
   };
 
 
