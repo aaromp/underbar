@@ -473,6 +473,30 @@ var _ = { };
   //
   // See the Underbar readme for details.
   _.throttle = function(func, wait) {
+    var result;
+    var timeout;
+    var firstRun = true;
+    var getCurrentTime = function() { return new Date().getTime(); };
+    var startTime = getCurrentTime();
+    var resetThrottle = function() {
+      firstRun = false;
+      clearTimeout(timeout);
+      startTime = getCurrentTime();
+      result = func.apply(this, arguments);
+    };
+
+    return function() {
+      var currentTime = getCurrentTime();
+      var timeRemaining = startTime + wait - currentTime;
+
+      if (timeRemaining <= 0 || firstRun) {
+        resetThrottle();
+      } else if (timeout === undefined) {
+        timeout = setTimeout(function() { resetThrottle(); }, timeRemaining);
+      }
+
+      return result;
+    };
   };
 
 }).call(this);
