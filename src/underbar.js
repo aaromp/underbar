@@ -137,7 +137,7 @@ var _ = { };
   _.invoke = function(collection, functionOrKey, args) {
     return _.map(collection, function(value, key, collection) {
       return typeof functionOrKey === "function" ? functionOrKey.apply(value, args):
-                                                   value[functionOrKey].apply(value, args);
+                                                   value[functionOrKey](args);
     });
   };
 
@@ -192,10 +192,8 @@ var _ = { };
       }
       
       if (typeof iterator(value) === 'boolean') value = iterator(value);
-      if (value === 1) value = true;
-      if (value === undefined || value === 0) value = false;
       
-      return value;
+      return !!value;
     }, true);
   };
 
@@ -311,7 +309,7 @@ var _ = { };
     }
     
     setTimeout(function() {
-      func.apply(this, args);
+      func.apply(null, args);
     }, wait);
   };
 
@@ -379,18 +377,11 @@ var _ = { };
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
     var result = [];
-    
-    var longestArgumentLength = 0;
-    for (var i = 0; i < arguments.length; i++) {
-      if (arguments[i].length > longestArgumentLength) longestArgumentLength = arguments[i].length;
-    }
-    
-    for (var i = 0; i < longestArgumentLength; i++) {
-      result.push([]);
-    }
+    var longest = Math.max.apply(null, (_.pluck(arguments, 'length')));
 
-    for (var i = 0; i < arguments.length; i++) {
-      for (var j = 0; j < longestArgumentLength; j++) {
+    for (var j = 0; j < longest; j++) {
+      result[j] = [];
+      for (var i = 0; i < arguments.length; i++) {
         result[j].push(arguments[i][j]);
       }
     }
@@ -421,14 +412,15 @@ var _ = { };
     
     for (var i = 0; i < arguments.length; i++) {
       for (var j = 0; j < arguments[i].length; j++) {
-        intersection[arguments[i][j]] = intersection[arguments[i][j]] === undefined ?
-          false : true;
+        intersection[arguments[i][j]] === undefined ?
+          intersection[arguments[i][j]] = 1 : intersection[arguments[i][j]]++;
       }
     }
     
     var result = [];
+    var numArgs = arguments.length;
     _.each(intersection, function(value, key, object) {
-      if (value) result.push(key);
+      if (value === numArgs) result.push(key);
     });
     
     return result;
@@ -437,22 +429,21 @@ var _ = { };
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var elements = {};
+    var arrayElements = {};
     for (var i = 0; i < array.length; i++) {
-      elements[array[i]] = true;
+      arrayElements[array[i]] = true;
     }
-    // this intersection code is repeated from _.intersection. It should probably be refactored
-    var intersection = {};
-    for (var i = 0; i < arguments.length; i++) {
-      for (var j = 0; j < arguments[i].length; j++) {
-        intersection[arguments[i][j]] = intersection[arguments[i][j]] === undefined ?
-          false : true;
-      }
+    
+    var intersection = _.intersection.apply(null, [array, _.flatten(Array.prototype.slice.call(arguments, 1))]);
+    
+    var intersectingElements = {};
+    for (var i = 0; i < intersection.length; i++) {
+      intersectingElements[intersection[i]] = true;
     }
 
     var difference = [];
     for (var i = 0; i < array.length; i++) {
-      if (!(elements[array[i]] && intersection[array[i]])) difference.push(array[i]);
+      if (arrayElements[array[i]] && !intersectingElements[array[i]]) difference.push(array[i]);
     }
 
     return difference;
